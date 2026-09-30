@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from 'react';
 import {
   Alert,
   Image,
@@ -13,6 +13,14 @@ import { formatearPrecio } from "../data/clases";
 
 export default function DetalleClaseScreen({ route }) {
   const { clase } = route.params;
+  const [cuposDisponibles, setCuposDisponibles] = useState(clase.cupos);
+
+  const reservarClase = () => {
+    Alert.alert(
+      'Reserva solicitada'
+    );
+    setCuposDisponibles((cuposActuales) => (cuposActuales - 1));
+  };
 
   return (
     <View style={styles.pantalla}>
@@ -41,7 +49,7 @@ export default function DetalleClaseScreen({ route }) {
           <Text style={styles.meta}>Modalidad: {clase.modalidad}</Text>
           <Text style={styles.meta}>Nivel: {clase.nivel}</Text>
           <Text style={styles.meta}>Duración: {clase.duracion} minutos</Text>
-          <Text style={styles.meta}>Cupos disponibles: {clase.cupos}</Text>
+          <Text style={styles.meta}>Cupos disponibles: {cuposDisponibles}</Text>
           <Text style={styles.meta}>Rating: {clase.rating}</Text>
           <Text style={styles.precio}>
             PRECIO: {formatearPrecio(clase.precio)}
@@ -55,12 +63,13 @@ export default function DetalleClaseScreen({ route }) {
           ))}
 
           <Pressable
-            style={styles.boton}
-            onPress={() =>
-              Alert.alert("Reserva creada", `Reservaste: ${clase.titulo}`)
-            }
-          >
-            <Text style={styles.textoBoton}>Reservar clase</Text>
+          style={[styles.boton, cuposDisponibles === 0 && styles.botonDeshabilitado]}
+          onPress={reservarClase}
+          disabled={cuposDisponibles === 0}
+        >
+          <Text style={styles.textoBoton}>
+            {cuposDisponibles === 0 ? 'Sin cupos' : 'Reservar clase'}
+          </Text>
           </Pressable>
         </View>
       </ScrollView>
@@ -77,6 +86,9 @@ const styles = StyleSheet.create({
   },
   contenido: {
     padding: 16,
+  },
+  botonDeshabilitado: { 
+    backgroundColor: colors.primarioSuave
   },
   titulo: {
     fontSize: 22,
